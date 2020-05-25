@@ -1,5 +1,6 @@
 import app from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/firestore'
 
 const myFirebaseConfig = {
     apiKey: process.env.REACT_APP_API_KEY,
@@ -15,15 +16,29 @@ class Firebase {
       app.initializeApp(myFirebaseConfig);
 
       this.auth = app.auth();
+      this.db = app.firestore();
+      this.db.settings({
+        timestampsInSnapshots: true
+      });
     }
 
     doCreateUserWithEmailAndPassword = (email, password) =>
     this.auth.createUserWithEmailAndPassword(email, password);
-
+ 
     doSignInWithEmailAndPassword = (email, password) =>
-    this.auth.signInWithEmailAndPassword(email, password);
-
+      this.auth.signInWithEmailAndPassword(email, password);
+  
     doSignOut = () => this.auth.signOut();
+  
+    doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
+  
+    doPasswordUpdate = password =>
+      this.auth.currentUser.updatePassword(password);
+ 
+    users = (fullname, email) => this.db.collection('users').add({
+      fullname,
+      email
+    })
 
 }
 
