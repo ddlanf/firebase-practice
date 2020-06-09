@@ -29,13 +29,17 @@ class SignUpFormBase extends Component {
   };
 
   onSubmit = event => {
-    const { email, passwordOne } = this.state;
+    const { email, passwordOne, username } = this.state;
  
     this.props.firebase
       .doCreateUserWithEmailAndPassword(email, passwordOne)
       .then(authUser => {
-          console.log(authUser)
-        this.setState({ ...INITIAL_STATE });
+          const uId = authUser.user.uid
+          this.props.firebase.users(username, email, uId).then(newUser =>{
+            console.log(newUser)
+            this.setState({ ...INITIAL_STATE });
+          })
+
       })
       .catch(error => {
           console.log(error)

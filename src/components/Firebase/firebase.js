@@ -1,6 +1,8 @@
 import app from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore'
+import 'firebase/storage'
+
 
 const myFirebaseConfig = {
     apiKey: process.env.REACT_APP_API_KEY,
@@ -17,9 +19,7 @@ class Firebase {
 
       this.auth = app.auth();
       this.db = app.firestore();
-      this.db.settings({
-        timestampsInSnapshots: true
-      });
+      this.storage = app.storage();
     }
 
     doCreateUserWithEmailAndPassword = (email, password) =>
@@ -34,12 +34,20 @@ class Firebase {
   
     doPasswordUpdate = password =>
       this.auth.currentUser.updatePassword(password);
- 
-    users = (fullname, email) => this.db.collection('users').add({
+    
+    doGetUserUId = () => this.auth.currentUser.uid;
+
+    users = (fullname, email, id) => this.db.collection('users').doc(id).set({
       fullname,
       email
     })
 
+    saveImage = (imageURL, id) => this.db.collection('users').doc(id).collection('images').add({
+      imageURL
+    })
+
+    doUploadFile = (fileName, file) => this.storage.ref(`images/${fileName}`).put(file)
+   
 }
 
 export default Firebase;
